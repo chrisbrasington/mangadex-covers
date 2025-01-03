@@ -4,9 +4,9 @@ This script allows you to generate an HTML file displaying all cover images of a
 
 ![](.img/dandadan.png)
 
-<!-- ![](.img/tsubasa.png)
+![](.img/tsubasa.png)
 
-![](.img/callofthenight.png) -->
+![](.img/callofthenight.png)
 
 ## Requirements
 - Python 3.x
