@@ -55,6 +55,10 @@ def generate_html(manga_title, covers):
                 margin: 10px;
                 border-radius: 8px;
             }}
+            a {{
+                display: inline-block;
+                margin: 5px;
+            }}
         </style>
     </head>
     <body>
@@ -63,9 +67,13 @@ def generate_html(manga_title, covers):
     """
     
     for cover in covers:
-        image_url = cover['attributes']['fileName']
-        image_url = f"https://mangadex.org/covers/{cover['relationships'][0]['id']}/{image_url}"
-        html_content += f'<img src="{image_url}" alt="Cover Image"/>\n'
+        image_filename = cover['attributes']['fileName']
+        cover_id = cover['relationships'][0]['id']
+        image_url = f"https://mangadex.org/covers/{cover_id}/{image_filename}"
+        
+        # Linking the image to its full-size version
+        full_image_url = f"https://mangadex.org/covers/{cover_id}/{image_filename}"
+        html_content += f'<a href="{full_image_url}" target="_blank"><img src="{image_url}" alt="Cover Image"/></a>\n'
     
     html_content += """
         </div>
@@ -75,9 +83,9 @@ def generate_html(manga_title, covers):
     
     return html_content
 
-# Function to open the generated HTML file
+# Function to open the generated HTML file with suppressed errors/warnings
 def open_html_file(html_file):
-    os.system(f'xdg-open {html_file}')
+    os.system(f'xdg-open {html_file} > /dev/null 2>&1')
 
 # Main function
 def main():
