@@ -2,9 +2,11 @@
 
 This script allows you to generate an HTML file displaying all cover images of a manga from MangaDex based on a provided manga URL.
 
-![](.img/tsubasa.png)
+![](.img/dandadan.png)
 
-![](.img/callofthenight.png)
+<!-- ![](.img/tsubasa.png)
+
+![](.img/callofthenight.png) -->
 
 ## Requirements
 - Python 3.x
