@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 import requests
@@ -114,7 +115,7 @@ def main():
     html_content = generate_html(manga_title, covers)
     
     # Define the output HTML file name
-    html_file = f"{manga_title.replace(' ', '_').lower()}.html"
+    html_file = f"covers/{manga_title.replace(' ', '_').lower()}.html"
     
     # Write the HTML content to the file
     with open(html_file, 'w') as file:

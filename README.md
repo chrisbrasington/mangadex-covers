@@ -4,6 +4,8 @@ This script allows you to generate an HTML file displaying all cover images of a
 
 ![](.img/tsubasa.png)
 
+![](.img/callofthenight.png)
+
 ## Requirements
 - Python 3.x
 - `requests` library
