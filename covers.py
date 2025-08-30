@@ -62,7 +62,16 @@ def generate_html(manga_title, covers):
         <h1>{manga_title} - Cover Images</h1>
         <div>
     """
-    
+
+    def volume_key(c):
+        vol = c['attributes']['volume']
+        try:
+            return float(vol)
+        except (TypeError, ValueError):
+            return float('inf')  # place non-numeric volumes at the end
+
+    covers.sort(key=volume_key)
+
     for cover in covers:
         image_filename = cover['attributes']['fileName']
         cover_id = cover['relationships'][0]['id']  # keep old working logic
