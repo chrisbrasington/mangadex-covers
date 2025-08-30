@@ -15,9 +15,7 @@ def extract_manga_id(url):
 # Function to fetch manga details (including title) from the MangaDex API
 def fetch_manga_details(manga_id):
     api_url = f'https://api.mangadex.org/manga/{manga_id}'
-    headers = {
-        'accept': 'application/json'
-    }
+    headers = {'accept': 'application/json'}
     response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
         return response.json()['data']['attributes']
@@ -28,9 +26,7 @@ def fetch_manga_details(manga_id):
 # Function to fetch covers from the MangaDex API
 def fetch_covers(manga_id):
     api_url = f'https://api.mangadex.org/cover?limit=100&manga%5B%5D={manga_id}&order%5BcreatedAt%5D=asc'
-    headers = {
-        'accept': 'application/json'
-    }
+    headers = {'accept': 'application/json'}
     response = requests.get(api_url, headers=headers)
     if response.status_code == 200:
         return response.json()['data']
@@ -69,12 +65,15 @@ def generate_html(manga_title, covers):
     
     for cover in covers:
         image_filename = cover['attributes']['fileName']
-        cover_id = cover['relationships'][0]['id']
-        image_url = f"https://mangadex.org/covers/{cover_id}/{image_filename}"
-        
-        # Linking the image to its full-size version
+        cover_id = cover['relationships'][0]['id']  # keep old working logic
+
+        # Full-size image
         full_image_url = f"https://mangadex.org/covers/{cover_id}/{image_filename}"
-        html_content += f'<a href="{full_image_url}" target="_blank"><img src="{image_url}" alt="Cover Image"/></a>\n'
+
+        # Thumbnail: always append .256.jpg
+        thumb_url = f"{full_image_url}.256.jpg"
+
+        html_content += f'<a href="{full_image_url}" target="_blank"><img src="{thumb_url}" alt="Cover Image"/></a>\n'
     
     html_content += """
         </div>
@@ -84,9 +83,9 @@ def generate_html(manga_title, covers):
     
     return html_content
 
-# Function to open the generated HTML file with suppressed errors/warnings
+# Function to open the generated HTML file
 def open_html_file(html_file):
-    os.system(f'xdg-open {html_file} > /dev/null 2>&1')
+    os.system(f'xdg-open "{html_file}" > /dev/null 2>&1')
 
 # Main function
 def main():
@@ -97,16 +96,17 @@ def main():
     manga_url = sys.argv[1]
     manga_id = extract_manga_id(manga_url)
     
-    # Fetch the manga title and cover data
+    # Fetch manga title and cover data
     manga_details = fetch_manga_details(manga_id)
     if not manga_details:
         print(f"Unable to fetch details for manga ID {manga_id}.")
         sys.exit(1)
     
-    manga_title = manga_details['title']['en'] if 'en' in manga_details['title'] else 'Untitled Manga'
+    # Fix title: use English if exists, else fallback to any language
+    titles = manga_details['title']
+    manga_title = titles.get('en') or next(iter(titles.values())) or 'Untitled Manga'
     
     covers = fetch_covers(manga_id)
-    
     if not covers:
         print(f"No covers found for manga ID {manga_id}.")
         sys.exit(1)
@@ -114,16 +114,14 @@ def main():
     # Generate HTML content
     html_content = generate_html(manga_title, covers)
     
-    # Define the output HTML file name
-    html_file = f"covers/{manga_title.replace(' ', '_').lower()}.html"
+    # Ensure output folder exists
+    os.makedirs("covers", exist_ok=True)
     
-    # Write the HTML content to the file
+    html_file = f"covers/{manga_title.replace(' ', '_').lower()}.html"
     with open(html_file, 'w') as file:
         file.write(html_content)
     
     print(f"HTML file '{html_file}' generated successfully.")
-    
-    # Open the HTML file using xdg-open
     open_html_file(html_file)
 
 if __name__ == "__main__":
